@@ -321,6 +321,7 @@ def particion_entr_prueba(X,y,test=0.20):
 
 class ClasificadorNoEntrenado(Exception): pass
 
+
   
 # Ejemplo "jugar al tenis":
 
@@ -333,10 +334,127 @@ class ClasificadorNoEntrenado(Exception): pass
 # >>> nb_tenis.clasifica(np.array([ej_tenis]))
 # ['no']
 
+class NaiveBayesCat():
+
+    #Inicializamos el constructor, con el suavizado que le vamos a poner
+    # y además del si va a entrenar, que por ahora va a ser false.
+    def __init__(self,k=1):
+        #La constante de suavizado (Laplace)
+        self.k = k
+        #Saber si ha sido entrenado
+        self.entrenado = False         
+        
+    #Vamos a entrenar el modelo. Sacamos las características iniciales.    
+    def entrena(self,X,y):
+        #X: matriz de datos (ejemplos x atributos)
+        #y: vector de clases
+        #El shape devuelve, la forma en este caso, filas = número de ejemplos y columnas = número de características
+        n_ejemplos, n_caracteristicas = X.shape
+
+        #unique, devuelve las etiquetas sin repetir, y return_counts, cuantas veces se repiten.
+        self.clases, clases_contador = np.unique(y, return_counts=True)
+        self.numero_clases = len(self.clases)
+
+        #P(c), la frecuencia de cada clase, probabilidad de cada clase
+        #Creamos diccionario vacío para guardar probabilidades
+        self.prior = {}
+        #Reccoremos las clases y sus cantidades, y con ello se calcula la frecuencia total.
+        for c, count in zip(self.clases, clases_contador):
+            self.prior[c] = count / n_ejemplos
+        
+        #Valores posibles por atributo
+        #Lista guardamos los valores de cada atributo
+        self.valores_atributo = []
+        #Por cada columna J,
+        for j in range(n_caracteristicas):
+            self.valores_atributo.append(np.unique(X[:, j])) #extrae toda la columna número j de la matriz, y nos quedamos con los valores únicos, es decir, los posibles.
+
+        #inicialiar los conteos, atributo -> valor -> clase -> número
+        self.conteos = []
+        for j in range(n_caracteristicas): #iteramos por cada caracterísitica
+            dic_valores = {}
+            for valor in self.valores_atributo[j]: #iteramos por cada posible valor calculado anteriormente.
+                dic_valores[valor] = {c: 0 for c in self.clases} #inicializamos el contador a 0
+            self.conteos.append{dic_valores} #guardamos el conteo en la lista
+
+        #contador de ejemplos por clase
+        self.conteos_clase = {c: 0 for c in self.clases}
+
+
+        #recorrer el dataset una sola vez
+        #contamos cuantos ejemplos hay de cada clase.
+        for i in range(n_ejemplos):
+            c = y[i]
+            self.conteos_clase[c] += 1
+            #cuantas veces aparece este valor en cada clase
+            for j in range(n_caracteristicas):
+                valor = X[i,j]
+                self-self.conteos[j][valor][c] +=1
+
+        #Una vez entrenado AL FINAL, el self.entrenado se pone a true
+        self.entrenado = True
+
+    def clasifica_prob(self,ejemplo):
+        if self.entrenado == False:
+            ClasificadorNoEntrenado("El modelo no ha sido Entrenado")
+
+        #P(c | x) ∝ P(c) * Π P(xi | c), pero usando logaritmos log(P(c)) + suma(log(P(xi|c)))
+        log_probs = {}
+
+        # Para cada clase calculamos log(P(c) * producto de probabilidades)
+        for c in self.clases:
+            # Empezamos con log(P(c))
+            log_prob = math.log(self.prior[c])
+
+            for j, valor in enumerate(ejemplo):
+                valores_posibles = self.valores_atributo[j]
+                num_valores = len(valores_posibles)
+
+                # Obtener conteo del valor en esa clase (puede no existir)
+                count = self.conteos[j].get(valor, {}).get(c, 0)
+
+                # Fórmula con suavizado de Laplace
+                prob = (count + self.k) / (
+                    self.conteo_clase[c] + self.k * num_valores
+                )
+
+                # Sumamos log(probabilidad)
+                log_prob += math.log(prob)
+
+            log_probs[c] = log_prob
+
+        #Convertir de log a probabilidades normales (normalización)
+        max_log = max(log_probs.values())  #para estabilidad numérica
+
+        exp_probs = {}
+        for c in self.clases:
+            exp_probs[c] = math.exp(log_probs[c] - max_log) #de log a normal
+
+        suma = sum(exp_probs.values())
+
+        probs = {}
+        for c in self.clases:
+            probs[c] = exp_probs[c] / suma
+
+        return probs
 
 
 
+    def clasifica(self,ejemplos):
 
+        if self.entrenado == False:
+            ClasificadorNoEntrenado("El modelo no ha sido Entrenado")
+
+        predicciones = []
+
+        for ejemplo in ejemplos:
+            probs = self.clasifica_prob(ejemplo)
+
+            # Elegimos la clase con mayor probabilidad
+            clase_predicha = max(probs, key=probs.get)
+            predicciones.append(clase_predicha)
+
+        return np.array(predicciones)
 
 
 
