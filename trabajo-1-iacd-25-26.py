@@ -7,13 +7,13 @@
 # --------------------------------------------------------------------------
 # Autor(a) del trabajo:
 #
-# APELLIDOS:
-# NOMBRE: 
+# APELLIDOS: RODRIGUEZ ORTEGA
+# NOMBRE: MIGUEL ÁNGEL
 #
 # Segundo componente (si se trata de un grupo):
 #
-# APELLIDOS:
-# NOMBRE:
+# APELLIDOS: MANZANO HERNÁNDEZ
+# NOMBRE: VIOLETA
 # ----------------------------------------------------------------------------
 
 
@@ -217,9 +217,36 @@ from carga_datos import *
 #  array([81, 91, 88]))
 # ------------------------------------------------------------------
 
+#Nos tiene que devolver 4 conjuntos:
+# Conjunto X: x_train y x_test
+# Conjutno y: y_train e y_test
+
+def particion_entr_prueba(X,y,test=0.20):
+
+    #le damos como una columna de indices y lo desordenamos, para que sea aleatorio.
+    # Si por ejemplo lo tenemos ordenado, y lo dividimos, el entrenamiento solo entrenaría con los últimos números, no tiene sentido.
+    indices = np.arange(X.shape[0])
+    np.random.shuffle(indices)
+
+    #AHora para dividirlo usamos la variable test, hasta cuanto lo queremos...
+    #Tenemos 100 filas y el 20% va a ser test.
+    # Por lo tanto queremos que el límite sea, 80 entrenamiento y 20 test
+    # calculamos cual es el 80%, que sería 
+    proporcion = len(X) * (1 - test)
+
+    #ya tenemos la proporción pues dividimos
+    #cogemos desde el inicio hasta la proporción
+    # desde la proporción hasta el final.
+    proporcion_train = indices[:proporcion]
+    proporcion_test = indices[proporcion:]
+
+    #se hace para cada uno, tanto para X como para y
+    X_train, X_test = X[:proporcion_train], X[proporcion_test:]
+    y_train, y_test = y[:proporcion_test], X[proporcion_test:]
 
 
-
+    #ya tenemos los subconjuntos
+    return X_train, X_test, y_train, y_test
 
 
 
