@@ -510,6 +510,106 @@ def rendimiento(clasificador, X,y):
 # Describir (dejándolo comentado) el proceso realizado en cada caso, 
 # y los rendimientos obtenidos. 
 
+#El objetivo es obtener el mejor rendimiento con varios datos, y ajustar el parámetro de k:
+
+k_valores = [0.1,0.25,0.5,0.75,1,1,.5,2,3]
+
+#cosas a recordar
+# Votos, ya está dividido X características e y etiqueta
+# Prestamos, se encuentra todo junto tanto X como Y, hay que dividirlo.
+# imdb, está dividido X e y, encima también en entrenamiento y prueba.
+# 
+# Por lo que cada una tiene un preprocesamiento distinto. 
+
+
+################DIVISION DE DATOS
+
+#Congresista
+X_votos_train, X_votos_test, y_votos_train, y_votos_test = particion_entr_prueba(X_votos, y_votos)
+
+#Prestamo
+X_credito_train, X_credito_test, y_credito_train, y_credito_test = particion_entr_prueba(X_credito, y_credito)
+
+#imdb ya están dividos, no hace falta dividirlo.
+# X_train_imdb
+# X_test_imdb
+# y_train_imdb
+# y_test_imdb
+
+#CONSULTAR CON VIOLETAAAAAAAAAAAAAAAAAAA. NO SÉ SI LO HE HECHO BIEN, AL COMPROBARLO AL CONJUNTO DE ENTRENAMIENTO Y NO DIRECTAMENTE AL CONJUNTO TEST.
+# PROCESO: 
+# 1. Primero dividimos el conjunto de datos en entrenamiento y test, si es que no se encuentra ya dividido, como el caso de imbd.
+# 2. Ajustamos el parámetro K utilizando el conjunto de entrenamiento.
+# 2.1 Se han probado distintos valores de k
+# 3. Entrenamos cada modelo, para saber cuál obtiene mejor rendimiento con K, y lo guardamos usando lógica (if). 
+# 4. Finalmente, utilizando la K más óptima se evalúa el modelo en el conjunto de test para obtener el rendimiento final del modelo.
+
+
+########CONGRESISTA
+
+mejor_k_votos = None
+mejor_rend_votos = 0
+
+for k in k_valores:
+    nb = NaiveBayesCat(k)
+    nb.entrena(X_votos_train, y_votos_train)
+
+    acc = rendimiento(nb, X_votos_train, y_votos_train)
+
+    #nos quedamos con la mejor K
+    if acc > mejor_rend_votos:
+        mejor_rend_votos = acc
+        mejor_k_votos = k
+
+# Modelo final
+nb_final_votos = NaiveBayesCat(mejor_k_votos)
+nb_final_votos.entrena(X_votos_train, y_votos_train)
+
+rendimiento_test_votos = rendimiento(nb_final_votos, X_votos_test, y_votos_test)
+
+
+#########CREDITO
+
+mejor_k_credito = None
+mejor_rend_credito = 0
+
+for k in k_valores:
+    nb = NaiveBayesCat(k)
+    nb.entrena(X_credito_train, y_credito_train)
+
+    acc = rendimiento(nb, X_credito_train, y_credito_train)
+
+    if acc > mejor_rend_credito:
+        mejor_rend_credito = acc
+        mejor_k_credito = k
+
+nb_final_credito = NaiveBayesCat(mejor_k_credito)
+nb_final_credito.entrena(X_credito_train, y_credito_train)
+
+rendimiento_test_credito = rendimiento(nb_final_credito, X_credito_test, y_credito_test)
+
+##########IMDB
+
+mejor_k_imdb = None
+mejor_rend_imdb = 0
+
+for k in k_valores:
+    nb = NaiveBayesCat(k)
+    nb.entrena(X_train_imdb, y_train_imdb)
+
+    acc = rendimiento(nb, X_train_imdb, y_train_imdb)
+
+    if acc > mejor_rend_imdb:
+        mejor_rend_imdb = acc
+        mejor_k_imdb = k
+
+nb_final_imdb = NaiveBayesCat(mejor_k_imdb)
+nb_final_imdb.entrena(X_train_imdb, y_train_imdb)
+
+rendimiento_test_imdb = rendimiento(nb_final_imdb, X_test_imdb, y_test_imdb)
+
+
+
 
 
 # --------------------------------------------
@@ -1166,28 +1266,28 @@ class ClasificadorNoEntrenado(Exception): pass
 
 # *********** DESCOMENTAR A PARTIR DE AQUÍ
 
-print("************ PRUEBAS EJERCICIO 1:")
-print("**********************************\n")
-Xe_votos,Xp_votos,ye_votos,yp_votos=particion_entr_prueba(X_votos,y_votos,test=1/3)
-print("Partición votos: ",y_votos.shape[0],ye_votos.shape[0],yp_votos.shape[0])
-print("Proporción original en votos: ",np.unique(y_votos,return_counts=True))
-print("Estratificación entrenamiento en votos: ",np.unique(ye_votos,return_counts=True))
-print("Estratificación prueba en votos: ",np.unique(yp_votos,return_counts=True))
-print("\n")
+# print("************ PRUEBAS EJERCICIO 1:")
+# print("**********************************\n")
+# Xe_votos,Xp_votos,ye_votos,yp_votos=particion_entr_prueba(X_votos,y_votos,test=1/3)
+# print("Partición votos: ",y_votos.shape[0],ye_votos.shape[0],yp_votos.shape[0])
+# print("Proporción original en votos: ",np.unique(y_votos,return_counts=True))
+# print("Estratificación entrenamiento en votos: ",np.unique(ye_votos,return_counts=True))
+# print("Estratificación prueba en votos: ",np.unique(yp_votos,return_counts=True))
+# print("\n")
 
-Xev_cancer,Xp_cancer,yev_cancer,yp_cancer=particion_entr_prueba(X_cancer,y_cancer,test=0.2)
-print("Proporción original en cáncer: ", np.unique(y_cancer,return_counts=True))
-print("Estratificación entr-val en cáncer: ",np.unique(yev_cancer,return_counts=True))
-print("Estratificación prueba en cáncer: ",np.unique(yp_cancer,return_counts=True))
-Xe_cancer,Xv_cancer,ye_cancer,yv_cancer=particion_entr_prueba(Xev_cancer,yev_cancer,test=0.2)
-print("Estratificación entrenamiento cáncer: ", np.unique(ye_cancer,return_counts=True))
-print("Estratificación validación cáncer: ",np.unique(yv_cancer,return_counts=True))
-print("\n")
+# Xev_cancer,Xp_cancer,yev_cancer,yp_cancer=particion_entr_prueba(X_cancer,y_cancer,test=0.2)
+# print("Proporción original en cáncer: ", np.unique(y_cancer,return_counts=True))
+# print("Estratificación entr-val en cáncer: ",np.unique(yev_cancer,return_counts=True))
+# print("Estratificación prueba en cáncer: ",np.unique(yp_cancer,return_counts=True))
+# Xe_cancer,Xv_cancer,ye_cancer,yv_cancer=particion_entr_prueba(Xev_cancer,yev_cancer,test=0.2)
+# print("Estratificación entrenamiento cáncer: ", np.unique(ye_cancer,return_counts=True))
+# print("Estratificación validación cáncer: ",np.unique(yv_cancer,return_counts=True))
+# print("\n")
 
-Xe_credito,Xp_credito,ye_credito,yp_credito=particion_entr_prueba(X_credito,y_credito,test=0.4)
-print("Estratificación entrenamiento crédito: ",np.unique(ye_credito,return_counts=True))
-print("Estratificación prueba crédito: ",np.unique(yp_credito,return_counts=True))
-print("\n\n\n")
+# Xe_credito,Xp_credito,ye_credito,yp_credito=particion_entr_prueba(X_credito,y_credito,test=0.4)
+# print("Estratificación entrenamiento crédito: ",np.unique(ye_credito,return_counts=True))
+# print("Estratificación prueba crédito: ",np.unique(yp_credito,return_counts=True))
+# print("\n\n\n")
 
 
 

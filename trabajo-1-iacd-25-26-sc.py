@@ -168,3 +168,71 @@ def rendimiento(clasificador, X,y):
 # -------------------------------------
 
 
+k_valores = [0.1,0.25,0.5,0.75,1,1,.5,2,3]
+
+
+X_votos_train, X_votos_test, y_votos_train, y_votos_test = particion_entr_prueba(X_votos, y_votos)
+
+X_credito_train, X_credito_test, y_credito_train, y_credito_test = particion_entr_prueba(X_credito, y_credito)
+
+
+mejor_k_votos = None
+mejor_rend_votos = 0
+
+for k in k_valores:
+    nb = NaiveBayesCat(k)
+    nb.entrena(X_votos_train, y_votos_train)
+
+    acc = rendimiento(nb, X_votos_train, y_votos_train)
+
+
+    if acc > mejor_rend_votos:
+        mejor_rend_votos = acc
+        mejor_k_votos = k
+
+
+nb_final_votos = NaiveBayesCat(mejor_k_votos)
+nb_final_votos.entrena(X_votos_train, y_votos_train)
+
+rendimiento_test_votos = rendimiento(nb_final_votos, X_votos_test, y_votos_test)
+
+
+mejor_k_credito = None
+mejor_rend_credito = 0
+
+for k in k_valores:
+    nb = NaiveBayesCat(k)
+    nb.entrena(X_credito_train, y_credito_train)
+
+    acc = rendimiento(nb, X_credito_train, y_credito_train)
+
+    if acc > mejor_rend_credito:
+        mejor_rend_credito = acc
+        mejor_k_credito = k
+
+nb_final_credito = NaiveBayesCat(mejor_k_credito)
+nb_final_credito.entrena(X_credito_train, y_credito_train)
+
+rendimiento_test_credito = rendimiento(nb_final_credito, X_credito_test, y_credito_test)
+
+
+mejor_k_imdb = None
+mejor_rend_imdb = 0
+
+for k in k_valores:
+    nb = NaiveBayesCat(k)
+    nb.entrena(X_train_imdb, y_train_imdb)
+
+    acc = rendimiento(nb, X_train_imdb, y_train_imdb)
+
+    if acc > mejor_rend_imdb:
+        mejor_rend_imdb = acc
+        mejor_k_imdb = k
+
+nb_final_imdb = NaiveBayesCat(mejor_k_imdb)
+nb_final_imdb.entrena(X_train_imdb, y_train_imdb)
+
+rendimiento_test_imdb = rendimiento(nb_final_imdb, X_test_imdb, y_test_imdb)
+
+
+
