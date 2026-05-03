@@ -143,3 +143,28 @@ class NaiveBayesCat():
             predicciones.append(clase_predicha)
 
         return np.array(predicciones)
+    
+
+# ----------------------------------------------
+# 2.2) Implementación del cálculo de rendimiento
+# ----------------------------------------------
+
+def rendimiento(clasificador, X,y):
+
+    y_pred = clasificador.clasifica(X)
+
+    aciertos = 0
+    for i in range(len(X)):
+        if y[i] == y_pred[i]:
+            aciertos += 1
+    
+    rendimiento = aciertos/ len(X)
+
+    return rendimiento
+
+
+# -------------------------------------
+# 2.3) Aplicando Naive Bayes categórico
+# -------------------------------------
+
+

@@ -472,6 +472,20 @@ class NaiveBayesCat():
 # >>> rendimiento(nb_tenis,X_tenis,y_tenis)
 # 0.9285714285714286
 
+#rendimiento, precisión, accuracy = número de aciertos / número total de ejemplos
+
+def rendimiento(clasificador, X,y):
+
+    y_pred = clasificador.clasifica(X)
+
+    aciertos = 0
+    for i in range(len(X)):
+        if y[i] == y_pred[i]:
+            aciertos += 1
+    
+    rendimiento = aciertos/ len(X)
+
+    return rendimiento
 
 
 
