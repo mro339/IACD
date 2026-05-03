@@ -25,13 +25,13 @@ def particion_entr_prueba(X,y,test=0.20):
     indices = np.arange(X.shape[0])
     np.random.shuffle(indices)
 
-    proporcion = len(X) * (1 - test)
+    proporcion = int(len(X) * (1 - test))
 
     proporcion_train = indices[:proporcion]
     proporcion_test = indices[proporcion:]
 
-    X_train, X_test = X[:proporcion_train], X[proporcion_test:]
-    y_train, y_test = y[:proporcion_test], X[proporcion_test:]
+    X_train, X_test = X[proporcion_train], X[proporcion_test]
+    y_train, y_test = y[proporcion_train], X[proporcion_test]
 
     return X_train, X_test, y_train, y_test
 

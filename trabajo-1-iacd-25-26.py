@@ -232,7 +232,7 @@ def particion_entr_prueba(X,y,test=0.20):
     #Tenemos 100 filas y el 20% va a ser test.
     # Por lo tanto queremos que el límite sea, 80 entrenamiento y 20 test
     # calculamos cual es el 80%, que sería 
-    proporcion = len(X) * (1 - test)
+    proporcion = int(len(X) * (1 - test))
 
     #ya tenemos la proporción pues dividimos
     #cogemos desde el inicio hasta la proporción
@@ -241,8 +241,8 @@ def particion_entr_prueba(X,y,test=0.20):
     proporcion_test = indices[proporcion:]
 
     #se hace para cada uno, tanto para X como para y
-    X_train, X_test = X[:proporcion_train], X[proporcion_test:]
-    y_train, y_test = y[:proporcion_test], X[proporcion_test:]
+    X_train, X_test = X[proporcion_train], X[proporcion_test]
+    y_train, y_test = y[proporcion_train], X[proporcion_test]
 
 
     #ya tenemos los subconjuntos
@@ -375,7 +375,7 @@ class NaiveBayesCat():
             dic_valores = {}
             for valor in self.valores_atributo[j]: #iteramos por cada posible valor calculado anteriormente.
                 dic_valores[valor] = {c: 0 for c in self.clases} #inicializamos el contador a 0
-            self.conteos.append{dic_valores} #guardamos el conteo en la lista
+            self.conteos.append(dic_valores) #guardamos el conteo en la lista
 
         #contador de ejemplos por clase
         self.conteos_clase = {c: 0 for c in self.clases}
@@ -389,7 +389,7 @@ class NaiveBayesCat():
             #cuantas veces aparece este valor en cada clase
             for j in range(n_caracteristicas):
                 valor = X[i,j]
-                self-self.conteos[j][valor][c] +=1
+                self.conteos[j][valor][c] +=1
 
         #Una vez entrenado AL FINAL, el self.entrenado se pone a true
         self.entrenado = True
@@ -1166,28 +1166,28 @@ class ClasificadorNoEntrenado(Exception): pass
 
 # *********** DESCOMENTAR A PARTIR DE AQUÍ
 
-# print("************ PRUEBAS EJERCICIO 1:")
-# print("**********************************\n")
-# Xe_votos,Xp_votos,ye_votos,yp_votos=particion_entr_prueba(X_votos,y_votos,test=1/3)
-# print("Partición votos: ",y_votos.shape[0],ye_votos.shape[0],yp_votos.shape[0])
-# print("Proporción original en votos: ",np.unique(y_votos,return_counts=True))
-# print("Estratificación entrenamiento en votos: ",np.unique(ye_votos,return_counts=True))
-# print("Estratificación prueba en votos: ",np.unique(yp_votos,return_counts=True))
-# print("\n")
+print("************ PRUEBAS EJERCICIO 1:")
+print("**********************************\n")
+Xe_votos,Xp_votos,ye_votos,yp_votos=particion_entr_prueba(X_votos,y_votos,test=1/3)
+print("Partición votos: ",y_votos.shape[0],ye_votos.shape[0],yp_votos.shape[0])
+print("Proporción original en votos: ",np.unique(y_votos,return_counts=True))
+print("Estratificación entrenamiento en votos: ",np.unique(ye_votos,return_counts=True))
+print("Estratificación prueba en votos: ",np.unique(yp_votos,return_counts=True))
+print("\n")
 
-# Xev_cancer,Xp_cancer,yev_cancer,yp_cancer=particion_entr_prueba(X_cancer,y_cancer,test=0.2)
-# print("Proporción original en cáncer: ", np.unique(y_cancer,return_counts=True))
-# print("Estratificación entr-val en cáncer: ",np.unique(yev_cancer,return_counts=True))
-# print("Estratificación prueba en cáncer: ",np.unique(yp_cancer,return_counts=True))
-# Xe_cancer,Xv_cancer,ye_cancer,yv_cancer=particion_entr_prueba(Xev_cancer,yev_cancer,test=0.2)
-# print("Estratificación entrenamiento cáncer: ", np.unique(ye_cancer,return_counts=True))
-# print("Estratificación validación cáncer: ",np.unique(yv_cancer,return_counts=True))
-# print("\n")
+Xev_cancer,Xp_cancer,yev_cancer,yp_cancer=particion_entr_prueba(X_cancer,y_cancer,test=0.2)
+print("Proporción original en cáncer: ", np.unique(y_cancer,return_counts=True))
+print("Estratificación entr-val en cáncer: ",np.unique(yev_cancer,return_counts=True))
+print("Estratificación prueba en cáncer: ",np.unique(yp_cancer,return_counts=True))
+Xe_cancer,Xv_cancer,ye_cancer,yv_cancer=particion_entr_prueba(Xev_cancer,yev_cancer,test=0.2)
+print("Estratificación entrenamiento cáncer: ", np.unique(ye_cancer,return_counts=True))
+print("Estratificación validación cáncer: ",np.unique(yv_cancer,return_counts=True))
+print("\n")
 
-# Xe_credito,Xp_credito,ye_credito,yp_credito=particion_entr_prueba(X_credito,y_credito,test=0.4)
-# print("Estratificación entrenamiento crédito: ",np.unique(ye_credito,return_counts=True))
-# print("Estratificación prueba crédito: ",np.unique(yp_credito,return_counts=True))
-# print("\n\n\n")
+Xe_credito,Xp_credito,ye_credito,yp_credito=particion_entr_prueba(X_credito,y_credito,test=0.4)
+print("Estratificación entrenamiento crédito: ",np.unique(ye_credito,return_counts=True))
+print("Estratificación prueba crédito: ",np.unique(yp_credito,return_counts=True))
+print("\n\n\n")
 
 
 
