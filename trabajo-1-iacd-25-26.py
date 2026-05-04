@@ -377,7 +377,7 @@ class NaiveBayesCat():
                 dic_valores[valor] = {c: 0 for c in self.clases} #inicializamos el contador a 0
             self.conteos.append(dic_valores) #guardamos el conteo en la lista
 
-        #contador de ejemplos por clase
+        #contador de ejemplos por clase, hace un diccionario.
         self.conteos_clase = {c: 0 for c in self.clases}
 
 
@@ -607,7 +607,6 @@ nb_final_imdb = NaiveBayesCat(mejor_k_imdb)
 nb_final_imdb.entrena(X_train_imdb, y_train_imdb)
 
 rendimiento_test_imdb = rendimiento(nb_final_imdb, X_test_imdb, y_test_imdb)
-
 
 
 
