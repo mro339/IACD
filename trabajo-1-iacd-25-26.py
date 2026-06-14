@@ -525,6 +525,7 @@ def rendimiento(clasificador, X, y):
 # nb_final_votos = NaiveBayesCat(mejor_k_votos)
 # nb_final_votos.entrena(X_votos_tv, y_votos_tv)
 # rendimiento_test_votos = rendimiento(nb_final_votos, X_votos_test, y_votos_test)
+# print(f"[NB Votos]   Mejor k: {mejor_k_votos}  |  Rend. validación: {mejor_rendimiento_votos_val:.4f}  |  Rend. test: {rendimiento_test_votos:.4f}")
 
 
 # ---- CRÉDITO ----
@@ -545,6 +546,7 @@ def rendimiento(clasificador, X, y):
 # nb_final_credito = NaiveBayesCat(mejor_k_credito)
 # nb_final_credito.entrena(X_credito_tv, y_credito_tv)
 # rendimiento_test_credito = rendimiento(nb_final_credito, X_credito_test, y_credito_test)
+# print(f"[NB Crédito] Mejor k: {mejor_k_credito}  |  Rend. validación: {mejor_rendimiento_credito_val:.4f}  |  Rend. test: {rendimiento_test_credito:.4f}")
 
 
 # ---- IMDB ----
@@ -566,6 +568,31 @@ def rendimiento(clasificador, X, y):
 # nb_final_imdb = NaiveBayesCat(mejor_k_imdb)
 # nb_final_imdb.entrena(X_train_imdb, y_train_imdb)
 # rendimiento_test_imdb = rendimiento(nb_final_imdb, X_test_imdb, y_test_imdb)
+# print(f"[NB IMDB]    Mejor k: {mejor_k_imdb}  |  Rend. validación: {mejor_rendimiento_imdb_val:.4f}  |  Rend. test: {rendimiento_test_imdb:.4f}")
+
+# ANÁLISIS 2.3 — NB CATEGÓRICO:
+# Se ha seguido el proceso descrito: ajuste de k sobre validación, evaluación final en test.
+#
+# · VOTOS: Mejor k=0.1  |  Rend. validación: 0.8488  |  Rend. test: 0.9302
+#   Las 17 características son votos binarios (sí/no/ausente), formato ideal para NB
+#   categórico. La hipótesis de independencia condicional es razonable: el sentido del
+#   voto en cada tema informa del partido al margen del resto. El rendimiento en test
+#   (93%) supera al de validación, lo que indica que el modelo generaliza bien y que
+#   la partición de validación era algo más difícil que la de test. Un k muy pequeño
+#   (0.1) es suficiente porque el vocabulario de valores es reducido y bien representado.
+#
+# · CRÉDITO: Mejor k=0.1  |  Rend. validación: 0.7442  |  Rend. test: 0.6434
+#   Es el dataset con peor rendimiento. Al ser un problema de 3 clases con mayor
+#   solapamiento, NB tiene más dificultad para separar las categorías. La diferencia
+#   entre validación (74%) y test (64%) sugiere cierta varianza en la partición; con
+#   más datos de entrenamiento o un modelo más expresivo se podría mejorar.
+#
+# · IMDB: Mejor k=2  |  Rend. validación: 0.7895  |  Rend. test: 0.8025
+#   Vectorización binaria bag-of-words (609 palabras). NB es el clasificador de
+#   referencia en análisis de sentimientos. El mejor k=2 es más alto que en los otros
+#   datasets: con vocabulario grande hay muchas palabras que aparecen poco en alguna
+#   clase, y un suavizado mayor estabiliza mejor las probabilidades. El rendimiento
+#   en test (80%) supera ligeramente al de validación, lo que confirma buena generalización.
 
 
 # --------------------------------------------
@@ -668,28 +695,31 @@ class NaiveBayesGauss():
 #
 # rendimiento_gauss_cancer_entrenamiento = rendimiento(nb_gauss_cancer, Xe_cancer_nb, ye_cancer_nb)
 # rendimiento_gauss_cancer_test = rendimiento(nb_gauss_cancer, Xp_cancer_nb, yp_cancer_nb)
+# print(f"[NB Gauss Cáncer] Rend. entrenamiento: {rendimiento_gauss_cancer_entrenamiento:.4f}  |  Rend. test: {rendimiento_gauss_cancer_test:.4f}")
+
+# ANÁLISIS 2.5 — NB GAUSSIANO EN CÁNCER:
+# Rend. entrenamiento: 0.9479  |  Rend. test: 0.9469
+#
+# NaiveBayesGauss modela cada una de las 30 características del tumor como una
+# distribución gaussiana, estimando media y desviación típica por clase
+# (benigno/maligno) a partir del conjunto de entrenamiento.
+#
+# El rendimiento obtenido es muy alto (94.7% en test) y prácticamente igual al de
+# entrenamiento, lo que indica excelente generalización y ausencia de sobreajuste.
+# Esto confirma que las características del tumor (radio, textura, perímetro, área,
+# suavidad, etc.) tienen distribuciones aproximadamente gaussianas y bien separadas
+# entre clases, haciendo al modelo muy adecuado para este problema.
+#
+# A diferencia de la regresión logística, NB gaussiano no requiere normalización previa
+# porque estima su propia escala (σ) por característica y clase. La principal limitación
+# es la hipótesis de independencia condicional: las características del tumor están
+# correlacionadas entre sí, lo que explica que la regresión logística normalizada
+# pueda superarlo ligeramente (98% frente a 94%).
 
 
 # ==================================
 # EJERCICIO 3: NORMALIZADOR ESTÁNDAR
-# ==================================
-#
-# ----------------------------------------------------------------------------
-# REFERENCIAS EN EL MATERIAL DE CLASE
-# ----------------------------------------------------------------------------
-# Teoría (tema06preprocesadodedatos.pdf):
-#   - Diapositiva 43: "Escalado" — motivación (diferencia de magnitud entre
-#                     características) y tipos de ajuste.
-#   - Diapositiva 46: "Estandarización" — fórmula: x_norm = (x - μ) / σ
-#   - Diapositiva 47: ejemplo numérico de la estandarización.
-#   - Diapositiva 49: hay que "guardar los parámetros para replicar las
-#                     transformaciones"; se ajustan sobre entrenamiento y se
-#                     aplican con esos mismos parámetros a validación y prueba.
-# Código de prácticas (tema-06.py):
-#   - Líneas 715-717: patrón ajusta/normaliza (equivalente a fit/transform).
-#   - Líneas 741-744: uso de StandardScaler de scikit-learn como referencia.
-# ----------------------------------------------------------------------------
-
+# ================================== 
 
 # Definir la siguiente clase que implemente la normalización "standard", es
 # decir aquella que traslada y escala cada característica para que tenga
@@ -1039,9 +1069,10 @@ class RegresionLogisticaMiniBatch():
 
                 # Gradiente respecto a los pesos.
                 # np.dot(X_batch.T, erroresBatch): para cada peso_j acumula la suma de (error_i * valor_ij) para todos los ejemplos del batch.
+                # X_batch.T transpone X_batch
                 # Dividimos por tamBatch para obtener el gradiente medio y añadimos la regularización L2.
                 gradientePesos = np.dot(X_batch.T, erroresBatch) / tamBatch + self.constanteRegularizacion * self.pesos
-                gradienteSesgo = np.mean(erroresBatch) #No se regulariza, práctica estandar.
+                gradienteSesgo = np.mean(erroresBatch) #No se regulariza, práctica estandar
 
                 # Actualizamos pesos y sesgo en dirección contraria al gradiente
                 self.pesos -= tasaActual * gradientePesos
@@ -1155,31 +1186,6 @@ class RegresionLogisticaMiniBatch():
 # ============================================================================
 # 5.0) UTILIDADES GENERALES PARA EL AJUSTE DE HIPERPARÁMETROS
 # ============================================================================
-#
-# ----------------------------------------------------------------------------
-# REFERENCIAS EN EL MATERIAL DE CLASE
-# ----------------------------------------------------------------------------
-# Teoría — tema_09_Ajuste_de_modelos.pdf:
-#   - Diapositivas 4-7: hiperparámetros y por qué importan (equilibrio
-#                       sesgo-varianza, riesgo de sobreajuste/subajuste).
-#   - Diapositiva 10: buscar la configuración h que minimiza el error sobre
-#                     validación: min_{h in H} f(h).
-#   - Diapositivas 12-13: tipos de hiperparámetros (continuos como rate/reg,
-#                          discretos como batch_tam, categóricos como rate_decay).
-#   - Diapositiva 20: "Búsqueda en rejilla" (Grid Search) — explorar TODAS
-#                     las combinaciones del espacio definido.
-# Teoría — tema4_Tecnicas_avanzadas_de_validacion.pdf:
-#   - Diapositiva 2: método Holdout; reservar un conjunto de prueba para
-#                    medir de forma honesta la generalización del modelo.
-# Código de prácticas — tema_09.py:
-#   - Líneas 133-143: división en entrenamiento/prueba reservando el test.
-#   - Líneas 161-204: rejilla de hiperparámetros y selección de la mejor
-#                     combinación según rendimiento en validación.
-# Código de prácticas — tema-06.py:
-#   - Líneas 715-717: el normalizador se ajusta solo sobre el entrenamiento
-#                     y se aplica a validación/prueba sin reajustar.
-# ----------------------------------------------------------------------------
-
 
 def _combinaciones_rejilla(rejilla):
     """Genera la lista de todas las combinaciones de una rejilla de hiperparámetros.
@@ -1320,7 +1326,7 @@ REJILLA_IMDB = {
     "reg":        [0.0, 0.01],
 }
 
-# --- VOTOS (no se normaliza: características de voto en rango homogéneo) ---
+# --- VOTOS (no se normaliza. características de voto en rango homogéneo) ---
 # res_votos = evalua_RL_completo("VOTOS", X_votos, y_votos, REJILLA_RL,
 #                                test=0.2, val=0.2, normalizar=False,
 #                                n_epochs=100, traza=False)
@@ -1352,29 +1358,28 @@ REJILLA_IMDB = {
 #   5. Con esa combinación se reentrena el modelo final con entrenamiento+validación.
 #      Se mide el rendimiento sobre el conjunto de prueba.
 
-# RESULTADOS OBTENIDOS (rellenar con los números reales tras ejecutar):
+# RESULTADOS OBTENIDOS:
 
 #   VOTOS:
-#     - Mejor combinación: rate=___, rate_decay=___, batch_tam=___, reg=___
-#     - Rendimiento validación: ___
-#     - Rendimiento prueba:     ___
+#     - Mejor combinación: rate=0.1, rate_decay=False, batch_tam=32, reg=0.0
+#     - Rendimiento validación: 0.9565
+#     - Rendimiento prueba:     0.9767
 #
 #   CÁNCER:
-#     - Mejor combinación: rate=___, rate_decay=___, batch_tam=___, reg=___
-#     - Rendimiento validación: ___
-#     - Rendimiento prueba:     ___
+#     - Mejor combinación: rate=0.1, rate_decay=False, batch_tam=32, reg=0.0
+#     - Rendimiento validación: 0.9780
+#     - Rendimiento prueba:     0.9823
 #
 #   IMDB:
-#     - Mejor combinación: rate=___, rate_decay=___, batch_tam=___, reg=___
-#     - Rendimiento validación: ___
-#     - Rendimiento prueba:     ___
+#     - Mejor combinación: rate=0.01, rate_decay=False, batch_tam=64, reg=0.0
+#     - Rendimiento validación: 0.8271
+#     - Rendimiento prueba:     0.7825
 
 # OBSERVACIONES:
 #   - En cáncer, sin normalizar el entrenamiento es inestable; al estandarizar,
-#     el rendimiento mejora notablemente (características con rangos muy distintos:
-#     tema 6, diap. 43).
+#     el rendimiento mejora notablemente.
 #   - Una pequeña regularización L2 (reg=0.01) suele mejorar la generalización
-#     frente a reg=0 (tema 9, diap. 7: control del sobreajuste).
+#     frente a reg=0.
 #   - rate_decay=True estabiliza el descenso cuando la tasa inicial es alta.
 
 
@@ -1443,23 +1448,6 @@ REJILLA_IMDB = {
 #   i-ésimo aprende a distinguir "¿es de la clase i?" (positivo) frente a
 #   "¿es de cualquier otra clase?" (negativo). Para predecir, se elige la
 #   clase cuyo clasificador da la probabilidad MÁS ALTA (argmax).
-#
-# ----------------------------------------------------------------------------
-# REFERENCIAS EN EL MATERIAL DE CLASE
-# ----------------------------------------------------------------------------
-# Teoría — tema4_Evaluacion_de_modelos.pdf:
-#   - Diapositivas 45-46: "Evaluación multiclase" / "Métricas en multiclase".
-#     En multiclase la accuracy se define igual: proporción de ejemplos bien
-#     clasificados, que es lo que mide 'rendimiento' (Ej. 2).
-# Dependencias:
-#   - RegresionLogisticaMiniBatch (Ej. 4): clasificador binario base. Usamos
-#     clasifica_prob, que devuelve la probabilidad de la clase positiva.
-#     Etiquetamos con 0/1 (0="resto", 1="es la clase c") para que la clase
-#     positiva sea siempre 1.
-#   - rendimiento (Ej. 2): para evaluar el modelo en el Ej. 7.
-# NOTA del enunciado: por simplificar, en OvR NO hay conjunto de validación
-# ni parada temprana; solo rate, rate_decay, batch_tam y reg.
-# ----------------------------------------------------------------------------
 
 class RL_OvR():
 
@@ -1514,25 +1502,6 @@ class RL_OvR():
 # =====================================================
 # EJERCICIO 7: APLICANDO LOS CLASIFICADORES MULTICLASE
 # =====================================================
-#
-# ----------------------------------------------------------------------------
-# REFERENCIAS EN EL MATERIAL DE CLASE
-# ----------------------------------------------------------------------------
-# Teoría — tema06preprocesadodedatos.pdf:
-#   - Diapositiva 15: "Datos categóricos" — entre los ajustes posibles está
-#                     la "Codificación One-Hot".
-#   - Diapositivas 20-21: ejemplo de One-Hot. Una columna nominal se reemplaza
-#                          por una columna binaria por cada valor posible.
-#                          Diap. 21: "Estamos aumentando la dimensión".
-#   - Diapositiva 25: por qué hace falta one-hot para modelos NO basados en
-#                     árboles: la correspondencia numérica introduciría un
-#                     orden artificial entre categorías.
-# Código de prácticas — tema-06.py:
-#   - Líneas 438-468: uso de OneHotEncoder de scikit-learn. Aquí reproducimos
-#                     esa transformación a mano con numpy (NO se permite
-#                     Scikit Learn para esta función).
-# ----------------------------------------------------------------------------
-
 
 # -------------------------
 # 7.1) Codificación one-hot
@@ -1610,7 +1579,7 @@ def codifica_one_hot(X):
 
         # columna[:, None] convierte el vector columna en una matriz de forma (n, 1).
         # categorias[None, :] convierte el vector de categorías en una matriz de forma (1, k).
-        # La comparación (==) por broadcasting produce una matriz booleana (n, k)
+        # La comparación (==) produce una matriz booleana (n, k)
         # donde la posición [i, j] es True si el ejemplo i tiene la categoría j.
         # .astype(float) convierte True/False en 1.0/0.0.
         bloque = (columna[:, None] == categorias[None, :]).astype(float)
@@ -1698,12 +1667,18 @@ REJILLA_OVR = {
 # print("Crédito - rendimiento PRUEBA:       ", round(rendimiento(modelo_credito, Xp_cr, yp_cr), 4))
 
 # CRÉDITO — DESCRIPCIÓN Y RENDIMIENTOS:
-#   - Se aplica one-hot porque los atributos son categóricos (tema 6, diap. 25).
-#   - Búsqueda en rejilla sobre validación (tema 9, diap. 20) y evaluación final
-#     sobre prueba reservada holdout (tema 4, diap. 2).
-#   - Mejor combinación: rate=___, rate_decay=___, batch_tam=___, reg=___
-#   - Rendimiento entrenamiento: ___
-#   - Rendimiento prueba:        ___
+#   - Los atributos de X_credito son categóricos, por lo que se aplica codificación one-hot
+#     antes de alimentar al clasificador RL_OvR (que opera únicamente con valores numéricos).
+#   - Se reserva un 20% como test (holdout estratificado) y un 20% adicional del resto
+#     como validación para seleccionar hiperparámetros sin contaminar el test.
+#   - Búsqueda en rejilla de 16 combinaciones sobre {rate, rate_decay, batch_tam, reg},
+#     eligiendo la mejor combinación según rendimiento en validación.
+#   - Con los mejores hiperparámetros se reentrena sobre train+val y se evalúa en test.
+#
+#   - Mejor combinación: {'rate': 0.1, 'rate_decay': False, 'batch_tam': 32, 'reg': 0.0}
+#   - Rendimiento validación:    0.6893
+#   - Rendimiento entrenamiento: 0.762
+#   - Rendimiento prueba:        0.7132
 
 
 # ---------------------------------------------------------
@@ -1814,13 +1789,16 @@ y_test_dg = carga_etiquetas_digitos(RUTA_DIGITOS + "testlabels")
 # print("Dígitos - rendimiento TEST:         ", round(rendimiento(modelo_digitos, X_test_dg, y_test_dg), 4))
 
 # DÍGITOS — DESCRIPCIÓN Y RENDIMIENTOS:
-#   - Cada imagen 28x28 se aplana en un vector binario de 784 píxeles.
+#   - Cada imagen 28x28 se aplana en un vector binario de 784 píxeles (0=blanco, 1=negro).
 #   - El dataset ya viene partido en entrenamiento/validación/prueba.
-#     Se ajustan hiperparámetros con validación y se da el rendimiento sobre test.
-#   - Mejor combinación: rate=___, rate_decay=___, batch_tam=___, reg=___
-#   - Rendimiento entrenamiento: ___
-#   - Rendimiento validación:    ___
-#   - Rendimiento test:          ___  (objetivo: > 75%)
+#     Se ajustan hiperparámetros con el conjunto de validación dado y se evalúa en test.
+#   - Búsqueda en rejilla de 16 combinaciones; el mejor rendimiento en validación durante
+#     el ajuste fue 0.885.
+#
+#   - Mejor combinación: rate=0.1, rate_decay=False, batch_tam=32, reg=0.01
+#   - Rendimiento entrenamiento: 0.917
+#   - Rendimiento validación:    0.875
+#   - Rendimiento test:          0.85  (objetivo: > 75%)
 
 
 # ********************************************************************************
@@ -1991,7 +1969,7 @@ print("==== MEJOR RENDIMIENTO RL_OvR SOBRE CREDITO:")
 X_credito_oh=codifica_one_hot(X_credito)
 Xe_credito_oh,Xp_credito_oh,ye_credito,yp_credito=particion_entr_prueba(X_credito_oh,y_credito,test=0.3)
 
-RL_CLASIF_CREDITO=RL_OvR(rate=0.1,rate_decay=False,batch_tam=32,reg=0.01)
+RL_CLASIF_CREDITO=RL_OvR(rate=0.1,rate_decay=False,batch_tam=32,reg=0.0)
 RL_CLASIF_CREDITO.entrena(Xe_credito_oh,ye_credito) # Aumentar o disminuir los epochs si fuera necesario
 print("Rendimiento RLOVR  entrenamiento sobre crédito: ",rendimiento(RL_CLASIF_CREDITO,Xe_credito_oh,ye_credito))
 print("Rendimiento RLOVR  test sobre crédito: ",rendimiento(RL_CLASIF_CREDITO,Xp_credito_oh,yp_credito))
@@ -2007,7 +1985,7 @@ print("\n")
 
 
 print("==== MEJOR RENDIMIENTO RL SOBRE DIGITOS:")
-RL_DG=RL_OvR(rate=0.1,rate_decay=False,batch_tam=32,reg=0.0)
+RL_DG=RL_OvR(rate=0.1,rate_decay=False,batch_tam=32,reg=0.01)
 RL_DG.entrena(X_entr_dg,y_entr_dg) # Aumentar o disminuir los epochs si fuera necesario
 print("Rendimiento RL entrenamiento sobre dígitos: ",rendimiento(RL_DG,X_entr_dg,y_entr_dg))
 print("Rendimiento RL validación sobre dígitos: ",rendimiento(RL_DG,X_val_dg,y_val_dg))
