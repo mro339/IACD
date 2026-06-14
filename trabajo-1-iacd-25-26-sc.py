@@ -1,3 +1,15 @@
+# --------------------------------------------------------------------------
+# Autor(a) del trabajo:
+#
+# APELLIDOS: RODRIGUEZ ORTEGA
+# NOMBRE: MIGUEL ÁNGEL
+#
+# Segundo componente (si se trata de un grupo):
+#
+# APELLIDOS: MANZANO HERNÁNDEZ
+# NOMBRE: VIOLETA
+# ----------------------------------------------------------------------------
+
 import math
 import random
 import numpy as np
